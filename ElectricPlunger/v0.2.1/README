@@ -1,0 +1,26 @@
+These are the files that were sent to the PCB fab to make the 
+prototype circuit board.
+
+ plunger-smt.brd - EAGLE Circuit board layout (http://cadsoft.de)
+ plunger-smt.sch - EAGLE Schematic
+ parts.txt - exported parts list from Eagle
+ plunger-smt.G?? - gerber files sent to the fab (http://barebonespcb.com)
+ plunger-smt.TXT - drill file sent to the fab (http://barebonespcb.com)
+
+Here are the problems I found after v0.2.1:
+
+- No power LED
+- RX and TX need to be swapped.
+- I added a 1K resistor in series for both RX and TX
+- The USB to TTL cable will not work if the 232RL chip is installed because 
+  there will be multiple drivers of the serial line.  Since I couldn't get the 
+  on-board USB to work, I cut those traces and used the FTDI USB to TTL cable 
+  instead.
+- The board would have been better designed with the current limiting resistor
+  after the PNP transistors instead of in front of the darlington array.   
+  Then the LED matrix could cycle through 6 columns instead of 10 rows 
+  (less flicker.)
+
+Eric Ayers
+ericzundel@gmail.com
+Wed Aug 26 09:44:39 EDT 2009
