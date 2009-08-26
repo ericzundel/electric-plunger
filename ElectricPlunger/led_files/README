@@ -1,0 +1,33 @@
+These files are the data to drive the LED display.  Format is ASCII.
+
+Each line describes a pattern to display in the LED matrix.  The line length
+is 65 characters (including a terminating newline)  The files can be arbitrarily
+long.  As a practical matter, the SD cars has a lot of capacity, and since 
+there is a stutter in the music when opening a new file, it would be
+better to make fewer long files than lots of short files.
+
+The first 4 characters are 4 ascii digits [0-9] that encode the time to display
+this sequence in milliseconds.  
+
+The next 60 characters descrive the values for each of the rows.
+0 == LED off
+1-4 == LED on
+
+(Originally, the matrix could display different intensitites, but when playing 
+music and driving the LED, there was unacceptable flickering)
+
+Examples:
+
+Display the first row for 1 second:
+1000111111000000000000000000000000000000000000000000000000000000
+
+Display the second row for 1 second:
+1000000000111111000000000000000000000000000000000000000000000000
+
+Display the first column for 1 second
+1000100000100000100000100000100000100000100000100000100000100000
+
+Display all leds on for a quarter second, then turn them off 
+for a quarter second:
+0250111111111111111111111111111111111111111111111111111111111111
+0250000000000000000000000000000000000000000000000000000000000000
