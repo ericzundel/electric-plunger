@@ -1,6 +1,6 @@
 /*
-  LedMatrix.h
-  lass for driving the 10x6 LED matrix on the ApuPlunger
+ * LedMatrix.h
+ * Class for driving the 10x6 LED matrix on the ApuPlunger
  */
 
 #ifndef LedMatrix_h
@@ -24,9 +24,9 @@ class LedMatrix {
   // Returns true if the matrix is ready to display new data.
   bool IsReady();
 
-  // Call this function as often as possible 
-  // (maybe it should fire on a timer interrupt?)
+  // Call this function as often as possible. 
   void RunStateMachine();
+  // If you are already in an interrupt, you can use this function.
   void RunStateMachineFromInterrupt();
 
  private:
@@ -37,16 +37,28 @@ class LedMatrix {
   int LedStateComputeRow();
   void SendToShiftRegister(unsigned long value);
 
+  // Pins to communicate with the shift register
   int led_data_pin_;
   int led_clock_pin_;
   int led_output_enable_pin_;
+
+  // Current state in the state machine
   char led_state_;
+
+  // Indicates the last time a row was turned on.
   unsigned long last_action_time_;
+
   // Each LED can have intensity 0-9, sorted as ascii chars
   char led_values_[LED_NUM_ROWS][LED_NUM_COLS]; 
+
+  // Current row being displayed
   int current_row_;
+
+  // Current intensity value being displayed
   int current_value_;
+
+  // Provides protection against re-entrancy from interrupts.
   bool in_progress_;
 };
 
-#endif
+#endif  // LedMatrix_h
