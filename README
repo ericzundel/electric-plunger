@@ -1,1 +1,13 @@
-This is the repo for the electric plunger circuit.
+This is the repo for the electric plunger circuit.  
+
+The plunger circuit is originally based on:
+
+the Arduino Project: http://arduino.cc
+the Adafruit wave shield by Limor Fried: http://adafruit.com
+And uses the WaveHC library by Bill Greiman: http://code.google.com/p/wavehc
+
+License: Creative Commons Attribution 3.0
+See LICENSE for more details
+
+Eric Z. Ayers
+Wed Aug 26 10:46:42 EDT 2009
