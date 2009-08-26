@@ -3,14 +3,29 @@ This is the driver shipped with the original Electric plunger on 26 Aug.
 It plays .wav files and flashes the LED matrix.
 The .wav and .led files must reside in the root directory
 
+The WaveHC file is from http://code.google.com/p/WaveHC
+The LedMatrix library is something I wrote
+
+I modified the WaveHC file to run the LedMatrix state machine more frequently.
+
+The WaveHC API accesses the SdReader and FatReader APIs from inside an interrupt
+making the LedMatrix flash a lot.  I modified these libraries to allow other
+code to be called while those libraries are stooging around waiting for the 
+sdcard to respond.
+
 Notes:
 
 *** Don't leave the plunger turned on with the card un-installed.  The EEPROM 
-has a limited number of writes (1 million) over its lifetime.  I fear that 
-this would cause the writes to cycle quickly.
+has a limited number of writes (100,000) over its lifetime.  I fear that 
+this would cause the writes to cycle quickly (but this is unconfirmed)
+
+* To further extend the life of the EEPROM, use long LED files and audio clips 
+instead of lots of short ones, *or* change th code to write to the EEPROM less 
+frequently, if at all.
 
 - The crystal on the original plunger is 20 MHz and the Arduino 
 development environment expects 16 MHz board.  I cloned the 16MHz Duemilanove
 board description in boards.txt and changed the frequency to 20000000.
 
-
+-Eric
+Wed Aug 26 10:34:33 EDT 2009

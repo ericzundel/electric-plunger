@@ -1,5 +1,10 @@
 /*
- * Final Apu plunger driver
+ * Electric plunger driver
+ * 
+ * Copyright 2009 Eric Z Ayers
+ *
+ * License: Creative Commons Attribution 3.0 
+ * See LICENSE file for more details
  *
  */
 
