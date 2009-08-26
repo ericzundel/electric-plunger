@@ -1,0 +1,16 @@
+This is the driver shipped with the original Electric plunger on 26 Aug.
+
+It plays .wav files and flashes the LED matrix.
+The .wav and .led files must reside in the root directory
+
+Notes:
+
+*** Don't leave the plunger turned on with the card un-installed.  The EEPROM 
+has a limited number of writes (1 million) over its lifetime.  I fear that 
+this would cause the writes to cycle quickly.
+
+- The crystal on the original plunger is 20 MHz and the Arduino 
+development environment expects 16 MHz board.  I cloned the 16MHz Duemilanove
+board description in boards.txt and changed the frequency to 20000000.
+
+
