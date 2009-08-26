@@ -1,6 +1,13 @@
 /*
  * LedMatrix.h
- * Class for driving the 10x6 LED matrix on the ApuPlunger
+ *
+ * Class for driving the 10x6 LED matrix on the ElectricPlunger
+ * See more documentation in LedMatrix.cpp.
+ *
+ * Copyright 2009 Eric Z. Ayers
+ *
+ * License: Creative Commons Attribution 3.0
+ *          See LICENSE file for more details
  */
 
 #ifndef LedMatrix_h

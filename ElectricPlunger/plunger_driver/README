@@ -4,14 +4,13 @@ It plays .wav files and flashes the LED matrix.
 The .wav and .led files must reside in the root directory
 
 The WaveHC file is from http://code.google.com/p/WaveHC
-The LedMatrix library is something I wrote
+The LedMatrix library is something I wrote.
 
-I modified the WaveHC file to run the LedMatrix state machine more frequently.
-
-The WaveHC API accesses the SdReader and FatReader APIs from inside an interrupt
-making the LedMatrix flash a lot.  I modified these libraries to allow other
-code to be called while those libraries are stooging around waiting for the 
-sdcard to respond.
+The WaveHC API accesses the SdReader and FatReader APIs from inside an
+interrupt making the LedMatrix flash a lot.  I modified the WaveHC
+file to run the LedMatrix state machine more frequently by passing in
+a function to run while those libraries are stooging around waiting
+for the sdcard to respond.
 
 Notes:
 

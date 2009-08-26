@@ -1,13 +1,50 @@
-This is the repo for the electric plunger circuit.  
+This is the repo for a project that builds an Electric Plunger.  
+
+ATTRIBUTION:
+
+The plunger circuit and software was written by Eric Z. Ayers.
 
 The plunger circuit is originally based on:
 
-the Arduino Project: http://arduino.cc
-the Adafruit wave shield by Limor Fried: http://adafruit.com
-And uses the WaveHC library by Bill Greiman: http://code.google.com/p/wavehc
+  The Arduino Project: 
+    http://arduino.cc
+  The Adafruit wave shield by Limor Fried: 
+    http://adafruit.com
 
-License: Creative Commons Attribution 3.0
+The software uses:
+
+  The Arduino development environment (version 17) downloadable from:
+    http://arduino.cc
+  The WaveHC library by Bill Greiman (fat16): 
+    http://code.google.com/p/wavehc
+  Which in turn was based on Limor Fried's AF_Wave library:
+    http;//ladyada.net/
+
+In addition, I used AVRStudio and an AVRISPmkII to flash the bootloader
+to the ATMega386P.
+
+LICENSE:
+
+The code, circuits and other materials in this project may be re-used 
+or distributed under the terms of the Creative Commons Attribution 3.0 
+License.
+
 See LICENSE for more details
 
+SOURCE REPO:
+
+There is a public source code repo that can be accessed with 'git' using the 
+remote specification:
+  git@github.com:ericzundel/electric-plunger.git
+
+CONTENTS:
+
+ElectricPlunger/  Contains the project files for the ElectricPlunger project
+SoundDemo/        Sample code that just plays audio files (no led drivers)
+wavelib/          Other goodies from Bill Greimen's WaveHC library
+libraries/        Contains the libraries used by the project.
+
+-Eric.
+--
 Eric Z. Ayers
-Wed Aug 26 10:46:42 EDT 2009
+Aug 26 2009
