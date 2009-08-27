@@ -259,7 +259,7 @@ void LedMatrix::RunStateMachineFromInterrupt() {
 /*
  * Does the dirty work of calling the right state function and shifting to
  * the next state.
-
+ */
 void LedMatrix::RunStateMachineImpl() {
   int next_state;
 
