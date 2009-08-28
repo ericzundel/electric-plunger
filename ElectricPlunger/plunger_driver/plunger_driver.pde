@@ -313,7 +313,7 @@ void setup() {
 
   int seed;
   for (int i = 0; i < 100; ++i) {
-    if (seed = analogRead(16))
+    if (seed = analogRead(2))
       break;
   }
 
