@@ -1,9 +1,22 @@
-These sketches are a part of the APU Plunger project.
+These sketches are a part of the Electric Plunger project.
 
 The plunger has LEDs on its handle that light up and make a show.
+There are electronics and a speaker in the base.  The circuit contains
+a DAC to play music and a sdcard reader for storing data.
 
-There are electronics and a speaker in the base.
+circuit - schematics and board files used to design the electronics.
 
-Git Source repo at:
+led_matrix_development - a sketch that drives the LED matrix as a state
+    machine.  This was in preparation for writing the LedMatrix library.
 
-git@github.com:ericzundel/electric-plunger.git
+led_matrix_demo - a sketch that demonstrates using the LedMatrix library.
+
+led_files - Some sample .led files that are read by the plunger_driver project
+
+photos - Photos of the development of the projecct.
+
+plunger_driver - The code that was actually loaded into the electric plunger
+    to read .wav and .led files and display them.
+
+
+

@@ -9,9 +9,15 @@ prototype circuit board.
 
 Here are the problems I found after v0.2.1:
 
-- No power LED
-- RX and TX need to be swapped.
-- I added a 1K resistor in series for both RX and TX
+- The Power adapter had leads that required bigger holes than provided by 
+  the part.
+- Add a power LED
+- Add a power switch
+- RS232L and USB-TTL cable: RX and TX need to be swapped.
+- RS232RL chip: TEST needs to go to GROUND
+- RS232RL chip: needs to have DTR wired to reset, not RTS#
+- USB-TTL cable: I added a 1K resistor in series for both RX and TX since 
+  it is going between 5V and 3.3V logic
 - The USB to TTL cable will not work if the 232RL chip is installed because 
   there will be multiple drivers of the serial line.  Since I couldn't get the 
   on-board USB to work, I cut those traces and used the FTDI USB to TTL cable 
@@ -20,6 +26,8 @@ Here are the problems I found after v0.2.1:
   after the PNP transistors instead of in front of the darlington array.   
   Then the LED matrix could cycle through 6 columns instead of 10 rows 
   (less flicker.)
+- Add a connection for an external switch to be mounted on the plunger to 
+  advance to the next track.  Could use the reset line on SV8.
 
 Eric Ayers
 ericzundel@gmail.com

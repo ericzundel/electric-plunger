@@ -300,7 +300,7 @@ void LedMatrix::DisplayLeds(char* values) {
 }
 
 /*
- * Writes a 16 biy value to the pair of 74HC595 shift registers. 
+ * Writes a 16 bit value to the pair of 74HC595 shift registers. 
  * The outputs are turned off while the valuse is being shifted in.
  */
 void LedMatrix::SendToShiftRegister(unsigned long value) {

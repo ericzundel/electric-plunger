@@ -1,0 +1,91 @@
+These files pertain the to ElectricPlunger circuit.
+
+plunger-smt.brd - current Eagle 5.6.0 board file (http://cadsoftusa.com)
+plunger-smt.sch - current Eagle 5.6.0 schematic file
+v0.2/ - a schematic I posted for comments on forums.ladyada.net
+v0.2.1/ - the first version of the board I sent off to 4pcb.com for prototyping
+
+The circuit is a mashup of:
+  - Arduino Duemilanove board (http://arduino.cc)
+  - Adafruit Wave shield  (http://ladyada.net)
+  - A custom LED matrix driver
+
+All parts were sourced from Mouser, and the board manufactured by 4pcb.com
+
+DESIGN NOTES:
+
+Power:
+
+- The PTC is a life saver.  Without it I would have burned up the 
+  prototypes about a dozen tims.
+- The KFBDT regulator data sheets require just 2.2uf caps, but I went 
+  conservative and put in bigger 100uf caps.
+- Routing a 5V line under the 3.3V output of the 3.3V regulator was a bad 
+  idea.  I couldn't see under there and I thoguht I might have shorted the 
+  two traces.
+
+Audio:
+
+- Limor Fried suggested that upgrading TL07 opamp to a better audio 
+  amp (she suggested an LM386) would be a good idea.
+- I fretted over making sure the audio circuit was not noisy.  Getting
+  the grounds correct on a mixed analog/digital circuit are norotoriously
+  difficult.  I followed the advice I found here:
+    http://www.hottconsultants.com/techtips/split-gnd-plane.html
+  and here:
+    http://www.atmel.com/dyn/resources/prod_documents/doc7633.pdf
+  The board turned out well, the audio quality was very good (although 
+   not very loud.)
+- To eliminate noise, I added decoupling caps around most chips, but not 
+  all.  I should make sure each chip has one if I do another board.
+
+USB:
+ 
+- The USB on the v0.2.1 schematic is completely messed up.  
+    o TX and RX need to be switched 
+    o TEST needs to go to ground
+    o DTR needs to be connected to the cap before the RESET
+      line (to enable the Arduini auto-reset function)
+- When using the USB-TTL cable, the auto-reset doesn't work - you have
+  to hit the reset button when the Arduino env. is ready to upload to
+  the chip.
+- If we intend to have both the on-board USB and the USB-TTL work, there
+  has to be some kind of way to isolate so that both TX lines from USB 
+  don't interfere with each other (a switch?)
+
+LED Matrix:
+
+- The current limiting resistors mean that each line attached to the 
+  ULN2803 should only drive one LED at a time.  I should have put them
+  after the PNP transistors because then we could drive 10 LEDs at a time
+  instead of only 6, meaning we wouldn't have as much flicker and the 
+  matrix might be less timing sensitive.
+- After the board was made, someone suggested we add a vibrating motor.  That
+  could be driven by one of the spare ULN2803 lines.
+
+MPU:
+
+- I swapped out a 20MHz crystal for the original 16MHz one to try to get rid
+  of flicker in the LED matrix (it didn't work.).  This means that I had to
+  re-compile a custom bootloader.
+- Bringing out all the pins to headers was a good idea. I used this a lot
+  for debugging the prototype board.
+- I did not wire up the snd enable or brightness controls in the prototype.
+  An external button to swich to the next song (or reset the circuit) would
+  have been good.
+- I considered going to 3.3V on the MPU and then just leaving USB 5V or 
+  unregulated power going to the LED matrix.  Then, I could have talked 
+  to the SDCard directly with no buffer in between.  However, I would have 
+  to add more components for controlling the Led Matrix PNP transistors 
+  from 3.3V logic.
+
+Other:
+
+- I didn't really work out how to mount the speaker before assembling 
+  everything.   Stuffing it inside the plunger bottom had lots of issues.
+   o I tried hot gluing the speaker to the rubber, but it didn't stick.
+   o The speaker is heavy and has potential to damage the circuit board
+      if it isn't secured
+   o the speaker leads are prone to get damaged and will cause crappy sound
+   o A speaker mounted inside a rubber plunger bottom is not the ideal
+      acoustical environment.
