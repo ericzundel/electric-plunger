@@ -8,7 +8,6 @@
  *
  */
 
-#include <EEPROM.h>
 #include <LedMatrix.h>
 #include <FatReader.h>
 #include <SdReader.h>
@@ -16,20 +15,15 @@
 #include "WaveUtil.h"
 #include "WaveHC.h"
 
-#define DEBUG 1
-
-/*
- * EEPROM:
- * bytes 0,1 store a 16 bit int in the EEPROM stores the last song played
- * bytes 2,3 store a 16 bit int in the EEPROM stores the last LED file played
- */
-#define WAVE_EEPROM_ADDR 2
-#define LED_EEPROM_ADDR  4
+#define DEBUG 0
 
 SdReader card;
 FatVolume vol;
 uint8_t dirLevel; // indent level for file/dir names
 dir_t dirBuf;     // buffer for directory reads
+
+int next_wav_index;
+int next_led_index;
 
 /* Returns the number of bytes currently free in RAM */
 int freeRam(void)
@@ -57,22 +51,38 @@ static void sdErrorCheck(void)
   while(1);
 }
 
-/* Find the next file in the specified directory.   */
-static bool find_next_file_in_dir(FatReader& dir, 
-                                  int *last_file_played_idx) {
+static bool isWavFile(dir_t&); // decl
+static bool isLedFile(dir_t&); // decl
+
+static bool FindNextWavFile(FatReader& dir, int* last_index) {
   int index = 0;
   dir.rewind();
   while (dir.readDir(dirBuf) > 0) {
-    if (dirBuf.name[0] == '.') {
+    if (dirBuf.name[0] == '.' || !isWavFile(dirBuf))
       continue;
-    }
     index++;
-    if (index > *last_file_played_idx) {
-      *last_file_played_idx = index;
+    if (index > *last_index) {
+      *last_index = index;
       return true;
     }
   }
-  *last_file_played_idx = 0;
+  *last_index = 0;
+  return false;
+}
+
+static bool FindNextLedFile(FatReader& dir, int* last_index) {
+  int index = 0;
+  dir.rewind();
+  while (dir.readDir(dirBuf) > 0) {
+    if (dirBuf.name[0] == '.' || !isLedFile(dirBuf))
+      continue;
+    index++;
+    if (index > *last_index) {
+      *last_index = index;
+      return true;
+    }
+  }
+  *last_index = 0;
   return false;
 }
 
@@ -85,35 +95,6 @@ static void printName(dir_t &dir)
     Serial.print(dir.name[i]);
   }
   if (DIR_IS_SUBDIR(dir)) Serial.print('/');
-}
-
-static void writeInt16ToEEPROM(int address, int16_t value) {
-
-#if DEBUG
-  Serial.print("Storing: ");
-  Serial.print(value, DEC);
-  Serial.print("  Address: ");
-  Serial.println(address, DEC);
-#endif
-
-  byte val1 = value & 0xFF;
-  EEPROM.write(address, val1);
-  byte val2 = (value>>8) & 0xFF;
-  EEPROM.write(address + 1, val2);
-}
-
-static int16_t readInt16FromEEPROM(int address) {
-  byte val1 = EEPROM.read(address);
-  byte val2 = EEPROM.read(address + 1);
-  int16_t result = val1  + ((int16_t)val2<<8);
-
-#if DEBUG
-  Serial.print("Returning result: ");
-  Serial.print(result, DEC);
-  Serial.print("  Address: ");
-  Serial.println(address, DEC);
-#endif
-  return result;
 }
 
 /***********************************************************
@@ -147,18 +128,13 @@ static void wave_play_loop() {
     return;
   }
   // sdErrorCheck();
-  int next_file_index = readInt16FromEEPROM(WAVE_EEPROM_ADDR);
-  if (find_next_file_in_dir(wstate.root, &next_file_index)) {
-    if (!isWavFile(dirBuf)) {
-      // Skip
-      Serial.print("Not a WAV file: ");
-      printName(dirBuf);
-    } else if (!wstate.wave_file.open(vol, dirBuf)) {
-      Serial.print("Failed to open WAV file: ");
-      printName(dirBuf);
+  if (FindNextWavFile(wstate.root, &next_wav_index)) {
+    if (!wstate.wave_file.open(vol, dirBuf)) {
+      // Serial.print("Failed to open WAV file: ");
+      // printName(dirBuf);
     } else if (!wave.create(wstate.wave_file)) {
-      Serial.print(" Not a valid WAV: ");
-      printName(dirBuf);
+      // Serial.print(" Not a valid WAV: ");
+      // printName(dirBuf);
     } else {
 #if DEBUG
       Serial.print("Playing WAV file: ");
@@ -167,7 +143,6 @@ static void wave_play_loop() {
       wave.play();
     }
   }
-  writeInt16ToEEPROM(WAVE_EEPROM_ADDR, next_file_index);
 }
 
 /***********************************************************
@@ -255,57 +230,19 @@ static void led_loop() {
 
   // No more data in this file.  Open the next file 
   noInterrupts();
-  lstate.root.rewind();
-  int index = 0;
-  int next_file_index = readInt16FromEEPROM(LED_EEPROM_ADDR);
-  while (lstate.root.readDir(dirBuf) > 0) {
-    if (dirBuf.name[0] == '.') {
+  while (1) {
+    // Will return false when we reach the end.
+    if (!FindNextLedFile(lstate.root, &next_led_index))
       continue;
-    }
-    index++;
-    if (!isLedFile(dirBuf)) {
-#if DEBUG
-/*
-      Serial.print("LED: Skipping file : ");
-      printName(dirBuf);
-      Serial.println("");
-*/
-#endif
-      continue;
-    }
 
-#if DEBUG
-    Serial.print("Led File found: ");
-    printName(dirBuf);
-    Serial.println("");
-#endif
-
-    if (next_file_index >= index) {
-      continue;
-    }
-
+    // Not expected.      
     if (!lstate.led_file.open(vol, dirBuf)) {
       Serial.println("led_file.open failed");
       continue;
     }
-
-#if DEBUG
-    Serial.println("Led File Opened.");
-#endif
-    next_file_index = index;
+    // We have a new file open now.
     break;
   }
-
-  // Did we find a file? If not, reset the index.
-  if (!lstate.led_file.isOpen()) {
-#if DEBUG
-    Serial.println("Wrapped past last file found.");
-#endif    
-    next_file_index = 0;
-  }
-  
-  writeInt16ToEEPROM(LED_EEPROM_ADDR, next_file_index);
-
   interrupts();
 }
 
@@ -313,11 +250,24 @@ static void busy_func() {
   matrix.RunStateMachineFromInterrupt();
 }
 
+static void GetFileCounts(FatReader& dir, int* wav_count, int* led_count) {
+  dir.rewind();
+  while (dir.readDir(dirBuf) > 0) {
+    if (dirBuf.name[0] == '.')
+      continue;
+     else if (isLedFile(dirBuf))
+      (*led_count)++;
+     else if (isWavFile(dirBuf))
+      (*wav_count)++;
+  }
+}
+
 /******************************************************************************
  *  Main Entry Points
  *****************************************************************************/
 
 void setup() {
+  int i;
   Serial.begin(9600);
   Serial.print("Free Ram: ");
   Serial.print(freeRam(), DEC);
@@ -328,7 +278,7 @@ void setup() {
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
-
+    
   // if (!card.init(true)) {//play with 4 MHz spi  
   if (!card.init()) {//play with 8 MHz spi  
     putstring_nl("Card init. failed!");
@@ -360,6 +310,41 @@ void setup() {
     putstring_nl("Can't open root dir!"); while(1);
   }
   dirLevel = 0;
+
+  int seed;
+  for (int i = 0; i < 100; ++i) {
+    if (seed = analogRead(16))
+      break;
+  }
+
+#if DEBUG
+  Serial.print("Seed: ");
+  Serial.println(seed);
+#endif
+
+  randomSeed(seed);
+  // Count the # of wav and led files so we can choose
+  // a good one to start with.
+  // NOTE: This assumes led's and wav's are in the same
+  // directory.
+  int wav_count = 0, led_count = 0;
+  GetFileCounts(wstate.root, &wav_count, &led_count);
+  next_wav_index = random(wav_count);
+  next_led_index = random(led_count);
+  
+#if DEBUG
+  Serial.println("Counts:");
+  Serial.print("  WAV: ");
+  Serial.println(wav_count);
+  Serial.print("  LED: ");
+  Serial.println(led_count);
+
+  Serial.println("Indexes:");
+  Serial.print("  WAV: ");
+  Serial.println(next_wav_index);
+  Serial.print("  LED: ");
+  Serial.println(next_led_index);
+#endif
 
   wstate.wave_file.setBusyFunc(busy_func);
   card.setBusyFunc(busy_func);
